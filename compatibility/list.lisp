@@ -25,6 +25,67 @@
 
 |# 
 
+
+;; We want to only call this from the macro multi-do (or maybe another macro)
+;; Following is an example of using inc-inds
+;;  (loop do 
+;;        ....
+;; 	   (if (inc-inds inds dims) (loop-finish)))
+;; increment the indices inds. The upper limit of each index is given by
+;; given by lims. Return nil except when the indices roll over,
+;; in which case return t.
+;; This is like a numeration, except each digit is in a different base.
+;; the indices should all start at zero and will roll over when they reach
+;; the limit. Ie, if you have two decimal digits, you should set them to
+;; zero, give limits of (10 10) and then repeatedly increment them.
+;; Upon calling inc-inds on (9 9) roll will be t.
+(defun inc-inds (inds lims &aux (n (- (length inds) 1)) (roll nil) )
+  (loop for i from 0 to n do
+    (setf (elt inds i) (+ (elt inds i) 1))
+    (cond ((eq (elt inds i) (elt lims i))
+	   (cond ( (eq i n) (setq roll t)))
+	   (loop for j from 0 to i do
+		 (setf (elt inds j) 0)))
+	  (t (loop-finish))))
+  roll)
+
+; create a list of n indices initialized to 0
+(defun mixima-make-inds (n)
+  (make-list n :initial-element 0))
+
+;; multi-do -- nested loop with variable number of levels
+;; Example with two levels:
+;; (multi-do (j '(2 3)) (format t "~a, " j))
+;; (0 0), (1 0), (0 1), (1 1), (0 2), (1 2)
+;; Here j has a local binding. We may also exit the multi-do loop early via
+;; explicit call to loop-finish within the body.
+;; We can add ability to take initial value to this later, if needed
+(defmacro multi-do (inds-lims &rest body  &aux n nlims)
+  (let ( (n (gensym "n-"))
+         (nlims (gensym "nlims-" ))
+         (inds (first inds-lims))
+         (lims (second inds-lims)))
+    `(progn
+       (setf ,nlims ,lims)
+       (setf ,n (length ,nlims))
+       (let ( (,inds (mixima-make-inds ,n)) )
+         (loop do
+               ,@body
+               (if (inc-inds ,inds ,nlims) (loop-finish)))))))
+
+
+;; older version, not used
+(defmacro multi-do-1 (inds lims &rest body  &aux n nlims)
+  (let ( (n (gensym))
+         (nlims (gensym)))
+  `(progn (setf ,nlims ,lims)
+          (setf ,n (length ,nlims))
+;;          (format t "nlims ~a n ~a~%" ,nlims ,n)
+          (let ( (inds (mixima-make-inds ,n)) )
+            (loop do
+                  ,@body
+                  (if (inc-inds inds ,nlims) (loop-finish)))))))
+
 #|> Function List |#
 (defmix |$List| ( (args :oo) )
   (cons '(mlist simp) args))
@@ -225,63 +286,3 @@
 	     (t  (merror "set-part indices out of bounds"))))
 	(t
 		(set-part (elt expr (+ 1 i)) repl (rest inds)))))
-
-;; We want to only call this from the macro multi-do (or maybe another macro)
-;; Following is an example of using inc-inds
-;;  (loop do 
-;;        ....
-;; 	   (if (inc-inds inds dims) (loop-finish)))
-;; increment the indices inds. The upper limit of each index is given by
-;; given by lims. Return nil except when the indices roll over,
-;; in which case return t.
-;; This is like a numeration, except each digit is in a different base.
-;; the indices should all start at zero and will roll over when they reach
-;; the limit. Ie, if you have two decimal digits, you should set them to
-;; zero, give limits of (10 10) and then repeatedly increment them.
-;; Upon calling inc-inds on (9 9) roll will be t.
-(defun inc-inds (inds lims &aux (n (- (length inds) 1)) (roll nil) )
-  (loop for i from 0 to n do
-    (setf (elt inds i) (+ (elt inds i) 1))
-    (cond ((eq (elt inds i) (elt lims i))
-	   (cond ( (eq i n) (setq roll t)))
-	   (loop for j from 0 to i do
-		 (setf (elt inds j) 0)))
-	  (t (loop-finish))))
-  roll)
-
-; create a list of n indices initialized to 0
-(defun mixima-make-inds (n)
-  (make-list n :initial-element 0))
-
-;; multi-do -- nested loop with variable number of levels
-;; Example with two levels:
-;; (multi-do (j '(2 3)) (format t "~a, " j))
-;; (0 0), (1 0), (0 1), (1 1), (0 2), (1 2)
-;; Here j has a local binding. We may also exit the multi-do loop early via
-;; explicit call to loop-finish within the body.
-;; We can add ability to take initial value to this later, if needed
-(defmacro multi-do (inds-lims &rest body  &aux n nlims)
-  (let ( (n (gensym "n-"))
-         (nlims (gensym "nlims-" ))
-         (inds (first inds-lims))
-         (lims (second inds-lims)))
-    `(progn
-       (setf ,nlims ,lims)
-       (setf ,n (length ,nlims))
-       (let ( (,inds (mixima-make-inds ,n)) )
-         (loop do
-               ,@body
-               (if (inc-inds ,inds ,nlims) (loop-finish)))))))
-
-
-;; older version, not used
-(defmacro multi-do-1 (inds lims &rest body  &aux n nlims)
-  (let ( (n (gensym))
-         (nlims (gensym)))
-  `(progn (setf ,nlims ,lims)
-          (setf ,n (length ,nlims))
-;;          (format t "nlims ~a n ~a~%" ,nlims ,n)
-          (let ( (inds (mixima-make-inds ,n)) )
-            (loop do
-                  ,@body
-                  (if (inc-inds inds ,nlims) (loop-finish)))))))
