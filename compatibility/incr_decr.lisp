@@ -58,7 +58,7 @@
   (mixima-incr-decr x  -1 nil))
 
 
-(defun mixima-op-to (x oper &aux var incr retval name prname )
+(defun mixima-op-to (x oper &aux var incr name prname args form)
 ;  (format t "call ~a, oper ~a~%" x oper)
   (setq name (first x)) ; a list
   (setq prname (stripdollar(first name)))
