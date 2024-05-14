@@ -115,7 +115,7 @@ Distributed under the GNU General Public License."))
 ;  (format t "mixima-shell: ~a~%" s)
   (if  mixima-mma-shell-debug-flag (format t " mixima-shell: ~a.~%" s)))
 
-(defun mixima-read-eval-print-loop ( &aux input-and-parsed parsed-mma-input
+(defun mixima-read-eval-print-loop (&optional (stream t) &aux input-and-parsed parsed-mma-input
                                           mma-input-string max-input-string
                                           max-internal
                                           max-out-expr mma-out-expr(firsttime t)

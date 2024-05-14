@@ -3,7 +3,7 @@
 ;; GJL: This code pulled out of maxima.lisp . It allows parser to
 ;; work with gcl, which does not allow (setf (readtable-case mathrt) :preserve) 
 
-(defun mread1()
+(defun mread1(&optional (stream t))
   ;;  (format t "~% next char = ~s" (pc))
   (cond ((member (pc)'( #\space #\tab #\page) :test #'char=)
 	 (rc)(mread1))  ;; fix - 2x bug

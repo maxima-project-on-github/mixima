@@ -33,8 +33,6 @@
   (terpri)
   (td))
 
-(defvar stream t "default is to send output to display")
-
 
 ; decided not to call this.
 (defun disp-new (form &optional (stream t))
@@ -45,12 +43,12 @@
 		   (format stream "~a" form)
 		 (let ((hform (MakeHForm (atomwidth form)
 					 1 0 0 nil nil nil form)))
-		   (TestAndDisplay (disp-helper hform 1 1 nil) hform))))
+		   (TestAndDisplay (disp-helper hform 1 1 nil) hform stream))))
 	      (t
 	       (setq LIST (disp-helper form 1
 					(formatstruct-height form)
 					LIST))
-	       (TestAndDisplay LIST form)))))
+	       (TestAndDisplay LIST form stream)))))
 
 
 (defun disp (form &optional (stream t))
@@ -61,15 +59,15 @@
 		   (format stream "~a" form)
 		 (let ((hform (MakeHForm (atomwidth form)
 					 1 0 0 nil nil nil form)))
-		   (TestAndDisplay (disp-helper hform 1 1 nil) hform))))
+		   (TestAndDisplay (disp-helper hform 1 1 nil) hform stream))))
 	      (t
 	       (setq LIST (disp-helper form 1
 					(formatstruct-height form)
 					LIST))
-	       (TestAndDisplay LIST form)))))
+	       (TestAndDisplay LIST form stream)))))
 
 
-(defun disp-list (form)
+(defun disp-list (form stream)
   (let ((LIST nil))
 	(format stream "~%")
 	(cond ((atom form) form)
@@ -144,20 +142,20 @@
 ;; display it right away and exit.  2) if not, breaklines, "compress"
 ;; the Vertical forms if necessary.
 
-(defun TestAndDisplay (dls form)
+(defun TestAndDisplay (dls form stream)
   (setq dls (sort dls #'listyorderp))
   (cond ((< (formatwidth form) COL)
 	 (FinalDisplay dls (- (formatheight form)
-			      (formatstruct-voffset form)) ))
+			      (formatstruct-voffset form)) stream))
 	(t
 	 (let (brkptset)
 	   (loop
 	    (setq brkptset (GetBrkPtSet (copy-list dls) form))
 	    (when brkptset
 		  (Display dls brkptset (- (formatheight form)
-					   (formatstruct-voffset form)))
+					   (formatstruct-voffset form)) stream)
 		  (return 'DONE))
-	    (setq dls (disp-list (Compress form))))))))
+	    (setq dls (disp-list (Compress form) stream)))))))
 
 
 ;; brkptset is in the form of (74 145 224 ...)
@@ -272,14 +270,14 @@
 ;; input is an unsorted list and a brkptset
 ;; not written yet
 
-(defun Display (dls brkptset yaxis)
+(defun Display (dls brkptset yaxis stream)
   (let ((cursor 1) (tempdls nil) (ham1 nil) (ham2 nil) (bksl nil)
 	)
     (setq dls (sort dls #'listxorderp))
     (loop
      (when (null dls)
 	   (setq tempdls (sort tempdls #'listyorderp))
-	   (FinalDisplay tempdls yaxis)
+	   (FinalDisplay tempdls yaxis stream)
 	   (return 'DONE))
      (cond ((>= (Endpt (car dls)) (car brkptset))
 	    (cond ((< (dispstruct-x (car dls)) (car brkptset))
@@ -310,7 +308,7 @@
 			  :y (dispstruct-y (car dls))))
 		   (setq dls (sort (the list (append (list ham2) (cdr dls))) #'listxorderp)))
 		  (t
-		   (FinalDisplay tempdls yaxis)
+		   (FinalDisplay tempdls yaxis stream)
 		   (terpri)
 		   (terpri)
 		   (setq tempdls nil)
@@ -328,7 +326,7 @@
 
 ;; Display the final output list.       
 ;; yaxis isn't used.. 
-(defun FinalDisplay (dls yaxis)
+(defun FinalDisplay (dls yaxis stream)
   (let (old (x 1) (y 1) )
  (declare (fixnum x y))
      (setq dls (sort (the list dls) #'listyorderp))
