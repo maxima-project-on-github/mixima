@@ -117,7 +117,7 @@
   (setf nargs-spec (mixima-min-max-nargs grouped-args))
   (setf param-list (mixima-mk-param-list grouped-args))
   (setf arg-tests  (getf grouped-args :arg-tests ))
-  `(defmspec ,name (mix-call &aux mix-call-args attrs)
+  `(defmspec ,name (mix-call &aux mix-call-args)
      ,(cond ( (mixima-get-attribute name '|$HoldAll|)
              t)
            ( (mixima-get-attribute name '|$HoldFirst|)

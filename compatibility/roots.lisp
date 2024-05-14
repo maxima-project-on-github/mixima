@@ -34,9 +34,9 @@
 ;	  (format t "new expr ~a~%"  expr)
 ;          ($print expr)
 	  (list '(mlist) (list '(|$Rule|) (first args)
-                (mapply '$%mixima_newton (list expr (first args) (second args) eps (third optargs))))))
+                (mapply '$%mixima_newton (list expr (first args) (second args) eps (third optargs)) '$%mixima_newton))))
 	(t
-	 (list '(mlist) (list '(|$Rule|) (first args) (mapply '$find_root (cons expr args)))))))
+	 (list '(mlist) (list '(|$Rule|) (first args) (mapply '$find_root (cons expr args) '$find_root))))))
 
 
 

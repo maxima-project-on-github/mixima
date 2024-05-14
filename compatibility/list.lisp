@@ -65,7 +65,7 @@
          (nlims (gensym "nlims-" ))
          (inds (first inds-lims))
          (lims (second inds-lims)))
-    `(progn
+    `(let (,n ,nlims)
        (setf ,nlims ,lims)
        (setf ,n (length ,nlims))
        (let ( (,inds (mixima-make-inds ,n)) )

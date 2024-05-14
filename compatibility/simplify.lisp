@@ -3,6 +3,8 @@
 ;; These are not chosen at random, but to attempt to reproduce Mma Simplify
 ;; This is crude. Could look at leafcount like they do.
 (defmfun |$Simplify| (e &rest args &aux r1 r2 (count 0) (countlim 5)) 
+  ;; ARGS might plausibly supply flags or something, although it's not used at present
+  (declare (ignore args))
   (setq r1 e)
   (loop do 
 ;	(format t "Count ~a~%" count)

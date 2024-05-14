@@ -11,7 +11,7 @@
  Out[1]= Increment[a, 100]
 |#
 
-(defun mixima-incr-decr (x incr pre &aux var retval name prname )
+(defun mixima-incr-decr (x incr pre &aux var retval name prname form args)
 ;  (format t "call ~a~%" x)
   (setq name (first x)) ; a list
   (setq prname (stripdollar(first name)))
