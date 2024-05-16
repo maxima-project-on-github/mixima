@@ -642,6 +642,7 @@ nil mathrt)
 ;; parse the fraction part of a decimal number .123
 
 (defun parse-frac(end &aux x (num 0)(den 1))
+ (declare (ignore end))
  (loop
    ;; since all of the line termination chars are not digits, all we
    ;; need to check is for digits..

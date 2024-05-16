@@ -87,10 +87,11 @@
 		       :from-end 't :end (stack-ptr s))))
     (if loc (aref (stack-vals s)loc) default)))
 
-(defun stackprinter(a stream pl)
+(defun stackprinter(a stream print-level)
+  (declare (ignore print-level))
   (let ((fp (1- (stack-frameptr a)))
 	(sp (stack-ptr a)))
-  ;;pl, print-level, is not used			
+  ;; print-level is not used			
   ;; we don't print the size of the stack. Should we?
     (if (= 0 sp) (format stream "Empty Stack~%")  
       

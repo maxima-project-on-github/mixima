@@ -36,9 +36,9 @@
 (maxima::$load "parser_patch.lisp")
 (maxima::$load "mma-to-mixima.lisp")
 (maxima::$load "stack1.lisp")
-(maxima::$load "disp1.lisp")
 (maxima::$load "eval.lisp")
 (maxima::$load "pf.lisp")
+(maxima::$load "disp1.lisp")
 (maxima::$load "match.lisp")
 (maxima::$load "maxima.lisp")
 (maxima::$load "bf.lisp")
@@ -70,10 +70,10 @@
   t)
 |#
 
-(defun mixima  (&key verbose mockmmaeval) ;; top level
+(defun mixima  (&key mockmmaeval) ;; top level
   (let*
       ( (*package* (find-package :mma))
-	mma-out-exprhs parsed-mma-input 
+	parsed-mma-input 
 	(timesofar 0)
 	(mmaprefix "") (mmasuffix "")
 	(timeunit (/ 1.0 internal-time-units-per-second))

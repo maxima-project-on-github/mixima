@@ -376,6 +376,7 @@
 ;; it matches the rest of the expressions, or the pattern fails.
   
 (defun ml2quick (h pl el name condition)	
+  (declare (ignore pl))
   ;; the BlankSequence is at the end: try to match against
   ;; all the rest of the elements
   (let ((collect nil)
@@ -534,7 +535,7 @@
 				 
 	       ))))))
 	     		 
-(defun true2 (x y) t)		
+(defun true2 (x y) (declare (ignore x y)) t)		
 	       
 ;; match a pattern and an expression
 ;; Changed from version 1 to allow for pattern vars to appear repeated

@@ -230,7 +230,6 @@
         (maxbotmh 0)
 	(hoffset 0)
 	(voffset 0)
-	(ls nil)
 	(heightpacket nil)
 	(ret_format nil))
     (setf ret_format (BuildFormat (car args)));ignores other operands
@@ -238,8 +237,7 @@
 	(setf ret_format (parenformatter ret_format)))
     (setf st (get op 'stringform))
     (cond ((atom ret_format)
-	   (incf width  (atomwidth ret_format))
-	   (setq ls (list ret_format)))
+	   (incf width  (atomwidth ret_format)))
 	  (t
 	   (setq heightpacket (TopBotHs ret_format maxtoph maxbotmh))
 	   (setq maxtoph (car heightpacket))
@@ -262,14 +260,12 @@
         (maxbotmh 0)
 	(hoffset 0)
 	(voffset 0)
-	(ls nil)
 	(heightpacket nil)
 	(ret_format nil))
     (setf ret_format (BuildFormat (car args)))
     (setf st (get op 'stringform))
 	(cond ((atom ret_format)
-	       (incf width  (atomwidth ret_format))
-	       (setq ls (list ret_format)))
+	       (incf width  (atomwidth ret_format)))
 	      (t
 	       (setq heightpacket (TopBotHs ret_format maxtoph maxbotmh))
 	       (setq maxtoph (car heightpacket))
@@ -855,7 +851,7 @@
     (let* ((p1 (cadr x)) (p2 (caddr x))
              	 (temp (format nil 
 ;"~a" (maxima::MEVAL '( maxima::MTIMES 1.0 ( cadr x)) ))))  
-"~a" (maxima::MEVAL '( maxima::MPLUS 0.0 p1 p2 )))))  
+"~a" (maxima::MEVAL (list '(maxima::MPLUS) 0.0 p1 p2)))))  ;; not clear what's needed here; I've tried to guess. RHD 2024-05-16
 ;"~a" (|Plus| 0.0 p1 p2))))  ; hkm This has to be refined.
            ;             	 (temp (format nil "~D.~D" p1 p2)))
     temp))

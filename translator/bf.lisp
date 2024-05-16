@@ -345,7 +345,8 @@
 
 (defvar bigfloat-print-trace nil "t if you want to see internals of bigfloats")
 
-(defun bigfloatprintfunction (x s pl)  ;pl, print-level, is not used.
+(defun bigfloatprintfunction (x s print-level)  ; print-level is not used.
+  (declare (ignore print-level))
   (cond (bigfloat-print-trace
 	 (format s "[~s*2^~s]=~a"
 		 (bigfloat-fraction x)

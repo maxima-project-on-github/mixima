@@ -236,7 +236,7 @@
 (defun GetClosest (symb dls yaxis cursor)
   (let (x)
     (declare (fixnum x COL cursor yaxis)
-	     (function Endpt (t) fixnum))
+             (ftype (function (t) fixnum) Endpt))
     (loop
      (when (null dls) (return x))
      (when (> (- (the fixnum (Endpt (car dls)))
@@ -258,6 +258,7 @@
 ;; Compressible is not written yet
 
 (defun Compressible (form cursor)
+  (declare (ignore form cursor))
   nil)
 
 
@@ -325,8 +326,10 @@
 	    (setq dls (cdr dls)))))))
 
 ;; Display the final output list.       
-;; yaxis isn't used.. 
+;; yaxis isn't used..
+;; NOTE: I wonder if that implies some callers can be simplified, since they don't really have to supply YAXIS. RHD 2024-05-16
 (defun FinalDisplay (dls yaxis stream)
+  (declare (ignore yaxis))
   (let (old (x 1) (y 1) )
  (declare (fixnum x y))
      (setq dls (sort (the list dls) #'listyorderp))

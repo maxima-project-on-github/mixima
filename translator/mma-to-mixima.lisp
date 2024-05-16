@@ -128,7 +128,7 @@
 ; Returns a list of keys in the hash
 (defun get-hash-keys (hash)
   (let ((klist ()))
-    (maphash (lambda (x y) (setf klist (cons x klist))) hash)
+    (maphash (lambda (x y) (declare (ignore y)) (setf klist (cons x klist))) hash)
     klist))
 
 ; add key-val pairs from hashto to pre-existing hashfrom
@@ -699,7 +699,7 @@
 	(testc (macsyma-source (third expr)))
 	(oincrc (fourth expr))
 	(bodyc (macsyma-source(fifth expr)))
-	(nincrc) (incrh) (step) )
+	(incrh) (step) )
     (setf incrh (first oincrc))
     ( cond ( (or (eq incrh '|PreIncrement|) (eq incrh '|Increment|)  (eq incrh 'maxima::|PreIncrement|)  (eq incrh 'maxima::|Increment|))
 	    (setf step 1))
@@ -801,8 +801,9 @@
 ;; This is not correct. We need to splice lambda_args in,
 ;; or apply the surrounding code somehow. This was working in
 ;; a previous version, I thought...
+;; NOTE: I've attempted to do something vaguely sensible. RHD 2024-05-16
 (defun macsyma-source-slot-sequence(expr)
-  (format nil "lambda_args"))
+  (format nil "lambda_args[~{~a~^,~}]" (second expr)))
 
 ; not used now
 (defun macsyma-source-lambda(expr)
@@ -867,11 +868,9 @@
 ; put parens around comma separated list of statements
 ; remove NULL statements occur frequently in compound
 ; statement from Mma parser. I don't know if will ever break something.
-; We can try either non-destructive remove or 
-; destructive delete
 (defun macsyma-source-mprogn (expr)
 ;  (setf expr (remove 'NULL expr))
-  (delete 'NULL expr)
+  (setq expr (remove 'NULL expr))
   (format nil "(~a)" 
 	  (pjoin "," (mapcar #'macsyma-source (rest expr)))))
 

@@ -3,12 +3,12 @@
 ;; copyright (c) 1990 Richard J. Fateman; pieces by Tak Yan, Derek Lai
 ;; just started converting atoms like Foo to |Foo|. 7/4/09 RJF   for GCL
 
-(eval-when (compile) (load "mma"))
+(eval-when (:compile-toplevel) (load "mma"))
 (in-package :mma)
 ;;(require "stack1") (require "disp1")(require "pf")(require "simp1")(require "rat1")(require "match")
 (in-package :mma)
-;(eval-when (load) (export '(mockmma mockmma2 mread1))
-(eval-when (load) (export '(mockmma2 mread1)))
+;(eval-when (:load-toplevel) (export '(mockmma mockmma2 mread1))
+(eval-when (:load-toplevel) (export '(mockmma2 mread1)))
 
 (defvar COUNT 1 "line number for top-level. (same as (meval $Line))")
 (declaim (special env *expand*)) ;; environment
@@ -41,10 +41,6 @@
 (defun mockmma  (&key mockmma-verbose mockmmaeval) ;; top level
   (let*
     ( (*package* (find-package :mma))
-     h hs hin 
-     (timesofar 0)
-     (mmaprefix "") (mmasuffix "")
-     (timeunit (/ 1.0 internal-time-units-per-second))
      (env (make-stack :size 50));environment for matching binding
      )
     (declare (special env *package*))
@@ -57,13 +53,14 @@ Mockmma uses Maxima to emulate a small subset of commands in the syntax of Mathe
 which is a trademark of Wolfram Research Incorporated (WRI). 
 Mockmma is in no way associated with WRI and is based on code written by Richard Fateman in 1990.")
       )
-  (when (find-package :maxima)
-    (setq mmaprefix maxima::*prompt-prefix*)
-    (setq mmasuffix maxima::*prompt-suffix*))
   (mockmma-read-eval-print-loop)
 )
 
 (defun mockmma-read-eval-print-loop ( &aux parsed-with-input )
+  (let (h hs hin (timesofar 0) (mmaprefix "") (mmasuffix "") (timeunit (/ 1.0 internal-time-units-per-second)))
+  (when (find-package :maxima)
+    (setq mmaprefix maxima::*prompt-prefix*)
+    (setq mmasuffix maxima::*prompt-suffix*))
   (loop
    (catch 'to-mockmma-repl
             (setf *debugger-hook* #'mockmma-debugger-repl)
@@ -126,7 +123,7 @@ Mockmma is in no way associated with WRI and is based on code written by Richard
     |Set|
     '|$Line| (setq COUNT (1+ COUNT)))            
    
-   )))
+   ))))
 
 
 (defun mockmma-debugger-repl (condition me-or-my-encapsulation)
@@ -137,7 +134,7 @@ Mockmma is in no way associated with WRI and is based on code written by Richard
   )
 
 (defun maxima::maxima-lisp-debugger (condition me-or-my-encapsulation)
-  ;(declare (ignore me-or-my-encapsulation))
+  (declare (ignore me-or-my-encapsulation))
   (format t "~&Mockmma encountered an error:~%~% ~A" condition)
   (format t "~&~%Automatically continuing.~%")
   (throw 'mockmma2 t) ;  (throw 'maxima::to-maxima-repl t)
@@ -339,7 +336,7 @@ Mockmma is in no way associated with WRI and is based on code written by Richard
 ;; also, we have to decide which bigfloat to use... mpfun or rjf's
 ;; old bfstuff.
 
-(defun matrix-p(x) nil) ;;; for now, this will have to do.
+(defun matrix-p(x) (declare (ignore x)) nil) ;;; for now, this will have to do.
 (defun |SetQQ|(lhs rhs &aux h);; lhs=rhs, but don't mevaluate either.
   
   (setq h(cond ((atom lhs) lhs)
@@ -474,7 +471,6 @@ expr))
       ((ptr (stack-ptr env))
        (isflat (flatp phead))
        (isorderless (orderlessp phead))
-       (isfol (and isflat isorderless))
        (origfn phead)
        res)
     (if isflat nil (setq phead '|Sequence|))
