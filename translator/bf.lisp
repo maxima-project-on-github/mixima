@@ -238,6 +238,11 @@
 
 ;; various useful predicates
 
+;; Seems like this function must exist in Maxima src/float.lisp or elsewhere,
+;; but I couldn't find it. RHD 2024-05-18
+(defun bigfloat-diff (a b)
+  (maxima::bcons (maxima::fpdifference (rest a) (rest b))))
+
 (defun bigfloat-> (a b) (bigfloat-posp (bigfloat-diff  a b))) 
 (defun bigfloat-< (a b) (bigfloat-posp (bigfloat-diff  b a))) 
 (defun bigfloat-posp (x)(> (bigfloat-fraction x) 0))

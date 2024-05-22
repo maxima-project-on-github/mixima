@@ -215,7 +215,7 @@
 ;; Using Map([x]) := apply('map,x) failed with plot2d or Series or something.
 ;; All shadowed functions should prbly be done this way.
 ;; evaluation not controlled well. we evaluate once and  $map does again
-(defmix |$Map| (func form (spec :o))
+(defmix |$Map| (func form)
   (mapply '$map (list func form) '$map))
 
 ; Construct a nested list with with number of elements at each level given by

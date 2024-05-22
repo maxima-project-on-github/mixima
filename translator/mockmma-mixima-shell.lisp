@@ -36,6 +36,7 @@
 (maxima::$load "parser_patch.lisp")
 (maxima::$load "mma-to-mixima.lisp")
 (maxima::$load "stack1.lisp")
+(maxima::$load "rat1.lisp")
 (maxima::$load "eval.lisp")
 (maxima::$load "pf.lisp")
 (maxima::$load "disp1.lisp")
@@ -73,10 +74,6 @@
 (defun mixima  (&key mockmmaeval) ;; top level
   (let*
       ( (*package* (find-package :mma))
-	parsed-mma-input 
-	(timesofar 0)
-	(mmaprefix "") (mmasuffix "")
-	(timeunit (/ 1.0 internal-time-units-per-second))
 	(env (make-stack :size 50));environment for matching binding
 	)
     (declare (special env *package*))
@@ -87,9 +84,6 @@
       (format t 
 	      "Mixima VERSION VERSIONNUMBER 
 Distributed under the GNU General Public License."))
-  (when (find-package :maxima)
-    (setf mmaprefix maxima::*prompt-prefix*)
-    (setf mmasuffix maxima::*prompt-suffix*))
 ;  (clear-input ) ; does not seem to help
 ;  (if (listen) (format t "2 Char avail~%"))
   (mixima-read-eval-print-loop))
@@ -115,7 +109,7 @@ Distributed under the GNU General Public License."))
 ;  (format t "mixima-shell: ~a~%" s)
   (if  mixima-mma-shell-debug-flag (format t " mixima-shell: ~a.~%" s)))
 
-(defun mixima-read-eval-print-loop (&optional (stream t) &aux input-and-parsed parsed-mma-input
+(defun mixima-read-eval-print-loop (&optional (stream t) &aux parsed-mma-input
                                           mma-input-string max-input-string
                                           max-internal
                                           max-out-expr mma-out-expr(firsttime t)
@@ -123,18 +117,20 @@ Distributed under the GNU General Public License."))
                                           mma-parser-error-flag
                                           mma-parser-error-val
                                           mma-parser-error-string
+	                                      (mmaprefix "") (mmasuffix "")
                                           trailing-semicolon-flag )
+  (when (find-package :maxima)
+    (setf mmaprefix maxima::*prompt-prefix*)
+    (setf mmasuffix maxima::*prompt-suffix*))
   (loop
 ;   (setf mixima-mma-verbose-flag t)
 ;   (setf mixima-mma-shell-debug-flag t)
    (catch 'mma::to-mix-repl 
      ;; Setting *DEBUGGER-HOOK* here makes it impossible to break out of this loop.
      ;; (setf *debugger-hook* #'mma::mix-mma-repl)
-     (setf timesofar (get-internal-run-time))
                                         ; there is something in the input stream the first time through
      (if (or (not firsttime) (> mixima-entry-count 0))
          (format t "~%~aIn[~s]:= ~a" mmaprefix MIXIMA-MMA-COUNT mmasuffix))
-     (setf input-and-parsed (let ((maxima::errset nil)) (let ((foo (maxima::errset (mma::mma-parser)))) (if foo (first foo) (clear-input t)))))
      (setf parsed-with-input  (mma::mma-parser stream))
      (setf firsttime nil)
 ;     (format t " parser returned:  <~a>~%" parsed-with-input)

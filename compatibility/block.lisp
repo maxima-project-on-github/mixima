@@ -19,7 +19,7 @@
 ;; If the value thrown by Return is local to the mixprog (ie mprog) then
 ;; we don't see that value here.
 ;; maxima return gets it correctly
-(defun mixima-blocklike-to-block (x &aux plen stmt1 nstmt1 res )
+(defun mixima-blocklike-to-block (x &aux res )
   (setq x (cdr x))
   (let ((*mixima-flow-break-tag* (gensym)))
     (setf res (catch *mixima-flow-break-tag* (meval (cons '(mixprog simp) x)))))

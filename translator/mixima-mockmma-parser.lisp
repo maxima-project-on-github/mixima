@@ -421,7 +421,7 @@ nil mathrt)
 
 ;;; same as ps, but translate to macsyma.
 
-(defun disablepst(mstream  &aux (interactive nil) 
+#+nil (defun disablepst(mstream  &aux (interactive nil) 
 		       res 
 		       (*readtable* mathrt)
 		       (mathbuffer nil)
@@ -442,7 +442,7 @@ nil mathrt)
     (if (eq 'eof (peek-char nil mstream nil 'eof))(return 'done))
     ))
 
-(defparameter macsubs
+#+nil (defparameter macsubs
     '((Set . (maxima::msetq))
       (SetDelayed . (maxima::mdefine))
       (Equal . (maxima::mequal))
@@ -460,7 +460,7 @@ nil mathrt)
       (List . (maxima::mlist))
       (CompoundExpression . (maxima::mprogn))))
 
-(defun tomacsyma(r)
+#+nil (defun tomacsyma(r)
   (cond 
 ;;        ((numberp r) r) ;; handled by (atom r) ... below
 	((symbolp r)

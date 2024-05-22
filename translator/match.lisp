@@ -193,7 +193,7 @@
 			    ;; There are lots of commutative operators,
 			    ;; including symmetric ones (e.g. x=y).
 			    ;; this version is not quite right. see defun.
-			    (mlistol (cdr p)(cdr e) 0 (1-(length e)) condition))
+			    (mlistol (cdr p)(cdr e) 0 (1-(length e)) t))
 			   
 			   (t ;; Flat or not, ordered.
 			    ;; we must match in sequence all elements.
@@ -557,13 +557,10 @@
 ;; if x is atomic, if typ is not a type, or x is not of type typ, return nil.
 ;; in case x is a cons, see if its head is eq to typ.
 
-(defun mtypep(x typ)(if (atom x)
-			(multiple-value-bind 
-			 (isnoerr val)
-			 (errorset  ;;excl returns nil if no err, value of form
-			  (typep x typ))
-			 (if isnoerr val nil))
-		      (eq (car x) typ)))
+(defun mtypep (x typ)
+  (if (atom x)
+    (let ((maxima::errset nil)) (let ((foo (maxima::errset (typep x typ)))) (when foo (first foo))))
+    (eq (car x) typ)))
 
   
 (deftype |Integer|() 'integer)
@@ -646,8 +643,8 @@
 
 
 (defun |FreeQ| (l x) 
-  (labels((freeqx (h)(FreeQ h x))
-	  (dependsx (h)(null (FreeQ h x))))  ;;returns t or nil
+  (labels((freeqx (h)(|FreeQ| h x))
+	  (dependsx (h)(null (|FreeQ| h x))))  ;;returns t or nil
 	 (cond ((MatchQ l x) nil)
 	       ((consp l)(if (some #'dependsx (cdr l))
 			     nil t))

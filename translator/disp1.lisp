@@ -235,7 +235,7 @@
 
 (defun GetClosest (symb dls yaxis cursor)
   (let (x)
-    (declare (fixnum x COL cursor yaxis)
+    (declare (fixnum COL cursor yaxis)
              (ftype (function (t) fixnum) Endpt))
     (loop
      (when (null dls) (return x))

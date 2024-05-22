@@ -27,7 +27,7 @@
 |#
 
 
-(defmspec |$Sum| (ls &aux plen props)
+(defmspec |$Sum| (ls)
   (sum-or-product (cdr ls) t))
 
 (defmspec |$Product| (ls)
@@ -97,6 +97,7 @@
 ; return nil and print error message, because symbolic sums with step != 1 are
 ; not supported. (this function will not be called if step = 1)
 (defun miximadosum (expr ind low hi step sump &key (evaluate-summand t))
+  (declare (ignore evaluate-summand))
   (setq low (ratdisrep low) hi (ratdisrep hi)) ;; UGH, GAG WITH ME A SPOON
   (if (not (symbolp ind))
       (merror (intl:gettext "~:M: index must be a symbol; found ~M") (if sump '$sum '$product) ind))

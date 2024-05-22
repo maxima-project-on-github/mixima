@@ -18,11 +18,14 @@
 ;(defun print-help-items ()
 ;  (print-list-of-items (get-hash-keys *mix-help-hash*)))
 
+;; Omit functions which reference nonexistent variable MIXIMA-FUNCTION-LIST. RHD 2024-05-16
+#|
 (defun print-help-items ()
   (print-list-of-items mixima-function-list))
 
 (defun print-searched-help-items (str)
   (print-list-of-items (search-for-items mixima-function-list str)))
+ |#
 
 ;(defun print-searched-help-items (str)
 ;  (print-list-of-items (search-for-items (get-hash-keys *mix-help-hash*) str)))
@@ -50,8 +53,9 @@
   (set-item key entry))
 
 (defun print-one-example (example &aux mma maxin maxout comments type)
+  (declare (ignore type))
   (setf comments (getf example :comments))
-  (setf type (getf example :type))
+;  (setf type (getf example :type))
 ;  (if type (format t "type: ~a~%" type))
   (if comments (format t "~a~%" comments))
   (setf mma (getf example :mma))
@@ -111,6 +115,8 @@
 ; was this causing a problem ?
 (in-package :maxima)
 
+;; Omit function mixFuncs since it calls PRINT-SEARCHED-HELP-ITEMS. RHD 2024-05-16
+#|
 #|> Function mixFuncs |#
 ; search for names of compatibility functions matching
 ; a string
@@ -118,6 +124,7 @@
   (if (symbolp search-str) (setf search-str (string (stripdollar search-str))))
   (print-searched-help-items search-str)
   t)
+ |#
 
 #|> Function mixDoc |#
 ; Example: mixDoc(Table)

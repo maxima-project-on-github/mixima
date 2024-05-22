@@ -51,6 +51,7 @@
           nil)))
 
 (defun mixima-pos-spec-test (call pos e)
+  (declare (ignore pos))
   (cond ( (mixima-position-spec-p e) t)
         (t
          (format t "~a::psl: Position specification ~a in ~a~%    is not an integer or a list of integers.~%"

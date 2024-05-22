@@ -4,11 +4,13 @@
 ;; abort execution of body for this iteration
 #|> Function Continue |#
 (defmspec |$Continue| (x)
+  (declare (ignore x))
   (throw *mixima-flow-break-tag* '(mixima-continue)))
 
 ;; abort execution of body and exit loop
 #|> Function Break |#
 (defmspec |$Break| (x)
+  (declare (ignore x))
   (throw *mixima-flow-break-tag* '(mixima-break)))
 
 ;; abort execution of body and exit all enclosing For,While,etc. loops

@@ -79,8 +79,13 @@
 ;;  Numerical Integration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar mixima-nintegrate-option-hash  (make-hash-table :test #'equal ))
+(defvar mixima-nintegrate-method-hash  (make-hash-table :test #'equal ))
+(defvar mixima-nintegrate-rule-args)
+
 ; Need to put in a facility to save and restore these values
-(defun romberg-set-option-args ( &aux pgoal agoal maxrecur minrecur rombergmin rombergabs rombergtol rombergit )
+(defun romberg-set-option-args ( &aux pgoal agoal maxrecur minrecur epsrel epsabs )
+  (declare (special $rombergit $rombergmin $rombergabs $rombergtol))
 ;  (setq args (reverse args))
   (setq pgoal (gethash '|$PrecisionGoal|  mixima-nintegrate-option-hash))
   (setq agoal (gethash '|$AccuracyGoal|   mixima-nintegrate-option-hash))
@@ -119,7 +124,7 @@
 ;; following is plenty ugly
 ;; quad_qags returns a list. here, we only return the
 ;; first number
-(defun mquad_qags (expr args &aux res epsrel)
+(defun mquad_qags (expr args &aux res)
   (setq args (quags-append-option-args args))
   (setq res (mapply '$quad_qags (append (cons expr args)) '$quad_qags))
   (cond ( (mfuncall '$listp res)
@@ -192,7 +197,7 @@
 	(t 
 	 nil)))
 
-(defun mromberg (expr args &aux res epsrel)
+(defun mromberg (expr args &aux res)
   (romberg-set-option-args )
   (setq res (mapply '$romberg (append (cons expr args)) '$romberg))
   (cond ( (numberp res) res)
@@ -216,10 +221,10 @@
 	(errlfun1 errcatch))
     (cons '(mlist) ret)))
 
-(defun singtest (val x expr &aux res)
+(defun singtest (val x expr)
   (mfuncall 'mixerrcatch (list '($substitute)  val x expr)))
 
-(defun mixima-nintegrate-automatic (expr args &aux res ivar alim blim limres sing-flag)
+(defun mixima-nintegrate-automatic (expr args &aux res ivar alim blim sing-flag)
   (setq ivar (first args))
   (setq alim (second args)) 
   (setq blim (third args)) 
@@ -256,7 +261,7 @@
 ;; filter argument list, pulling out Rules and putting them in a hash
 ;; The filtered argument list is returned
 ;; Add code that checks for which rules are allowed for each function (passed in a list maybe)
-(defun mixima-collect-rules (hash args &aux arg nonrules)
+(defun mixima-collect-rules (hash args &aux nonrules)
   (setf mixima-nintegrate-rule-args  nil)
   (dolist (arg args)
     (cond ( (rulep arg)
@@ -269,9 +274,6 @@
   (setq mixima-nintegrate-rule-args (reverse mixima-nintegrate-rule-args))
   nonrules)
 
-(defvar mixima-nintegrate-option-hash  (make-hash-table :test #'equal ))
-(defvar mixima-nintegrate-method-hash  (make-hash-table :test #'equal ))
-(defvar mixima-nintegrate-rule-args)
 ;    (setq item (mfuncall '$mixima_minus_inf_to_minf item)) ; replace -inf -> minf
 
 ; put in a utility file
@@ -308,7 +310,8 @@
 ;; This is a 'fold' operation
 ;; upon failure return a quoted NIntegrate on everything except the
 ;; arguments that have already been integrated
-(defun multiNIntegrate (expr inargs args &aux res method doneargs)
+(defun multiNIntegrate (expr inargs args &aux res doneargs)
+  (declare (ignore inargs))
   (setq res expr)
   (dolist (item (reverse args)) ; eg item = [x,a,b]
     (setq doneargs (cons item doneargs))

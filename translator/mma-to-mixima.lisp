@@ -105,9 +105,9 @@
 |#
 
 
-(setq blank-sequence-var-args 'blank-sequence-val-nil)
-(setq lhs-intermediate-set 'lhs-intermediate-set-nil)
-(setq lhs-source-set 'lhs-source-set-nil)
+(defvar blank-sequence-var-args 'blank-sequence-val-nil)
+(defvar lhs-intermediate-set 'lhs-intermediate-set-nil)
+(defvar lhs-source-set 'lhs-source-set-nil)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Hash Utility function definitions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -283,7 +283,7 @@
 
 ; does not seem to make a difference
 ;(defvar source-infix-ops-table  (make-hash-table))
-(setq maxima::source-infix-ops-table  (make-hash-table))
+(defvar maxima::source-infix-ops-table  (make-hash-table))
 
 ;; Table used to translate intermediate-macsysma to Macsyma symbols
 ;; These are searched before source function table below.
@@ -343,7 +343,7 @@
 ;; For instance
 ;; the entry for 'For' will write a Macsyma 'for' statement.
 ;; !!! should be a defvar or something
-(setq *source-function-table*  (make-hash-table))
+(defvar *source-function-table*  (make-hash-table))
 (set-hash-elements *source-function-table*
 	'( 
 	  (*MPART macsyma-source-mpart) ; in current version should never be used .
@@ -995,6 +995,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
+(maxima::defmvar maxima::$mixima_translate_arrays nil)
+
+;; clear the hashes that try to keep track of Mma arrays
+(defun init-translation ()
+  ( cond ( (eq blank-sequence-var-args 'blank-sequence-val-nil) )
+         ( t
+           (format t "mma-to-max: init-translation blan-sequence-var-args not nil~%")
+           (setq blank-sequence-var-args 'blank-sequence-val-nil ) ))
+  (clrhash *array-element-hash*)
+  (clrhash *array-head-hash*)
+  (cond ( (and (boundp  'maxima::$mixima_translate_arrays) (listp maxima::$mixima_translate_arrays))
+          (add-declared-arrays maxima::$mixima_translate_arrays))
+        (t t)))
+
 ; input -- filename of file of Mma source
 ; output -- lisp list of intermediate Mma s-expression
 ; pslst is defined in mixima-mockmma-parser ie, it calls the (modified) Fateman parser
@@ -1058,20 +1072,7 @@
 
 (defun add-declared-arrays (array-list)
   (setf array-list (rest array-list))
-  (mapc (lambda (x) (increment-hash-value (maxima::concat x) *array-head-hash*))  array-list))
-
-;; clear the hashes that try to keep track of Mma arrays
-(defun init-translation ()
-  ( cond ( (eq blank-sequence-var-args 'blank-sequence-val-nil) )
-         ( t
-           (format t "mma-to-max: init-translation blan-sequence-var-args not nil~%")
-           (setq blank-sequence-var-args 'blank-sequence-val-nil ) ))
-  (clrhash *array-element-hash*)
-  (clrhash *array-head-hash*)
-  (cond ( (and (boundp  'maxima::$mixima_translate_arrays) (listp maxima::$mixima_translate_arrays))
-          (add-declared-arrays maxima::$mixima_translate_arrays))
-        (t t)))
-
+  (mapc (lambda (x) (increment-hash-value (maxima::$concat x) *array-head-hash*))  array-list))
 
 ; have to find a way to put a string valued parameter in the hash.
 ; I can only put literals in.
