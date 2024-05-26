@@ -38,6 +38,7 @@
 
 (mixima-set-attributes '|$Block| '( (|$HoldAll| t) ))
 (defmix |$Block| (argl body)
+  (declare (ignore argl body))
   (mixima-blocklike-to-block mix-call))
 
 ;;(defmspec |$Block| (x)

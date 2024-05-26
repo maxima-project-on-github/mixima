@@ -4,8 +4,8 @@ load ("compatibility/set_file_search_paths.mac");
 set_file_search_paths (".");
 
 load("mockmma-mixima-shell.lisp"); /* some defuns needed from here. should be moved */
-load("defs.lisp");
 load("helper.lisp");
+load("defs.lisp");
 load("function.lisp");
 load("newblock.lisp");
 load("assign.lisp");

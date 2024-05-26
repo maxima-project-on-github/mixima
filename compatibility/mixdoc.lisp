@@ -7,7 +7,7 @@
 
 (defun get-hash-keys (hash)
   (let ((klist ()))
-    (maphash (lambda (x y) (setf klist (cons x klist))) hash)
+    (maphash (lambda (x y) (declare (ignore y)) (setf klist (cons x klist))) hash)
     klist))
 
 (defun print-list-of-items (items)

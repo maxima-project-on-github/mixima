@@ -60,7 +60,7 @@
 ;; Here j has a local binding. We may also exit the multi-do loop early via
 ;; explicit call to loop-finish within the body.
 ;; We can add ability to take initial value to this later, if needed
-(defmacro multi-do (inds-lims &rest body  &aux n nlims)
+(defmacro multi-do (inds-lims &rest body)
   (let ( (n (gensym "n-"))
          (nlims (gensym "nlims-" ))
          (inds (first inds-lims))
@@ -73,18 +73,6 @@
                ,@body
                (if (inc-inds ,inds ,nlims) (loop-finish)))))))
 
-
-;; older version, not used
-(defmacro multi-do-1 (inds lims &rest body  &aux n nlims)
-  (let ( (n (gensym))
-         (nlims (gensym)))
-  `(progn (setf ,nlims ,lims)
-          (setf ,n (length ,nlims))
-;;          (format t "nlims ~a n ~a~%" ,nlims ,n)
-          (let ( (inds (mixima-make-inds ,n)) )
-            (loop do
-                  ,@body
-                  (if (inc-inds inds ,nlims) (loop-finish)))))))
 
 #|> Function List |#
 (defmix |$List| ( (args :oo) )
@@ -113,8 +101,7 @@
 	  (setq perm '(2 1)))  
 	(t
 	 (setq perm  (rest (meval* (third lis)))))) ; perm is a lisp list giving permutation of indices
-  (cond ( (not (listp arr)) (format t "Non-list passed to Transpose~%")))
-  (cond ( (not (listp arr)) (return nil))) ; broken fix this
+  (cond ( (not (listp arr)) (merror "Non-list passed to Transpose")))
   (setq dims (nested-list-dimensions arr)) ; get list of dimensions of levels of arr
   (setq n (length perm))
   (cond ( (> n (length dims)) 
@@ -178,7 +165,7 @@
 
 #|> Function Tuples |#
 ;; not all implemented, eg.  Tuples([a,b],[2,2]);
-(defmix |$Tuples| (lis (num :o) &aux inds olis lims head)
+(defmix |$Tuples| (lis (num :o) &aux olis head)
   (cond ( (null num)
 	  (setq lis (rest lis))
 	  (setq num (length lis))

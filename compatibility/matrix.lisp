@@ -98,7 +98,7 @@
 ; Do a binary dot. This is called by nary dot below.
 ; This handles tensors of any dimension. Vectors are handled in a separate branch.
 ; Need to write a branch for matrices for efficiency
-(defmfun $mixima_one_dot (t1 t2 &aux n j t3 dim1 dim2 dim3 inds resel)
+(defmfun $mixima_one_dot (t1 t2 &aux n j t3 dim1 dim2 dim3 resel)
   (cond ((and (mfuncall '|$VectorQ| t1) (mfuncall '|$VectorQ| t2))
 	 (if (eq (length t1) (length t2)) nil
 	   (progn  ($print "Vectors have different lengths")

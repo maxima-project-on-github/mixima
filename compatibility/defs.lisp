@@ -31,7 +31,7 @@
      call time to an argument checking routine.
 |#
 
-(defun mixima-group-args (args &aux (nargs (length args)) req-args optional-args
+(defun mixima-group-args (args &aux req-args optional-args
                                optional-rest aux-args rules aux-flag  (argc 0) tests test-list )
   (loop for e in args do
         (incf argc)
@@ -112,7 +112,7 @@
 ;;  I don't understand the difference between these two. But replacing defmfun with defmix
 ;;  causes at least this problem.
 (defmacro defmix (name args &rest body)
-  (let (args-spec grouped-args param-list callargs arg-tests)
+  (let (nargs-spec grouped-args param-list arg-tests)
   (setf grouped-args (mixima-group-args args))
   (setf nargs-spec (mixima-min-max-nargs grouped-args))
   (setf param-list (mixima-mk-param-list grouped-args))
