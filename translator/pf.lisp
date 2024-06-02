@@ -332,8 +332,8 @@
 	      ((integer 0 9) 1) ;; most common cases
 	      ((integer 10 99) 2)
 	      ((integer 100 999) 3)
-	      ((integer 0 1000000)(1+(floor (log x 10.0))))
-	      ((integer 0 1000000000000000)(1+(floor (log x 10.0d0))))
+	      ((integer 0 1000000)(1+(floor (cl:log x 10.0))))
+	      ((integer 0 1000000000000000)(1+(floor (cl:log x 10.0d0))))
 	      (integer   ;; rest of the cases
 	       (let* ((fg (floor (ash (integer-length x) 19) ;mult by 2^19
 				 1741647))

@@ -52,9 +52,9 @@
 
 (setq *print-level* nil *print-length* nil *print-pretty* t)
 
-(defun pc()(peek-char nil mstream nil #\newline))
+(defun pc(mstream)(peek-char nil mstream nil #\newline))
 ;(defun rc()(read-char mstream))
-(defun rc( &aux newchar)
+(defun rc(mstream &aux newchar)
   (setf newchar (read-char mstream))
   (setf input-string (concatenate 'string input-string (string newchar)))
   newchar)
@@ -67,11 +67,11 @@
 	  ((< h 58)  (- h  48)) ; #\0 is 48 in ascii.
 	  (t (- h 87)) ; #\a=97
 	     )))
-(defun collect-integer (val r)
-  (cond ((eql (pc) #\newline) val)
-	((digit-char-p (pc) r)	;r is radix
+(defun collect-integer (val r &optional (stream t))
+  (cond ((eql (pc stream) #\newline) val)
+	((digit-char-p (pc stream) r)	;r is radix
 
-	 (collect-integer (+ (char-to-int (rc))(* r val)) r))
+	 (collect-integer (+ (char-to-int (rc stream))(* r val)) r))
 ;;	((eql (pc) #\`)(rc)(collect-integer val r)) ;;option 123`456 is 123456.
 	(t val)))
 
@@ -85,15 +85,15 @@
      (declare (ignore char))
 ;;     (format t "processing slash")
 
-     (case (pc)
+     (case (pc mstream)
 	   (#\newline '/)
-	   (#\: (rc) '|/:|)
-	   (#\. (rc) '/.)
-	   (#\@ (rc) '/@)
-	   (#\; (rc) '|/;|)
-	   (#\= (rc) '/=)
-	   (#\/ (rc)
-		(case (pc) (#\newline '//) (#\@ (rc) '//@) (#\. (rc) '//.) (t '//)))
+	   (#\: (rc mstream) '|/:|)
+	   (#\. (rc mstream) '/.)
+	   (#\@ (rc mstream) '/@)
+	   (#\; (rc mstream) '|/;|)
+	   (#\= (rc mstream) '/=)
+	   (#\/ (rc mstream)
+		(case (pc mstream) (#\newline '//) (#\@ (rc mstream) '//@) (#\. (rc mstream) '//.) (t '//)))
 	   (t '/  )))
   nil mathrt)
 
@@ -101,59 +101,59 @@
   #'(lambda 
      (mstream char)
      (declare (ignore char))
-     (case (pc)
+     (case (pc mstream)
 	   (#\newline '^)
-	   (#\= (rc) '^=)
-	   (#\^ (rc) '^^)
-	   (#\: (rc)
-		(case (pc) (#\newline '|^:|) (#\= (rc) '|^:=|) (t '|^:|)))
+	   (#\= (rc mstream) '^=)
+	   (#\^ (rc mstream) '^^)
+	   (#\: (rc mstream)
+		(case (pc mstream) (#\newline '|^:|) (#\= (rc mstream) '|^:=|) (t '|^:|)))
 	   (t '^)))
   nil mathrt)
 
 (set-macro-character #\&
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '&) (#\& (rc) '&&) (t '&)))
+      (case (pc mstream) (#\newline '&) (#\& (rc mstream) '&&) (t '&)))
   nil mathrt)
 
 (set-macro-character #\|
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '\|) (#\| (rc) '\|\|) (t '\|)))
+      (case (pc mstream) (#\newline '\|) (#\| (rc mstream) '\|\|) (t '\|)))
   nil mathrt)
 
 (set-macro-character #\+
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc)
-		  (#\newline '+) (#\+ (rc) '++) (#\= (rc) '+=) (t '+)))
+      (case (pc mstream)
+		  (#\newline '+) (#\+ (rc mstream) '++) (#\= (rc mstream) '+=) (t '+)))
   nil mathrt)
 
 (set-macro-character #\*
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '*) (#\* (rc) '**) (#\= (rc) '*=) (t '*)))
+      (case (pc mstream) (#\newline '*) (#\* (rc mstream) '**) (#\= (rc mstream) '*=) (t '*)))
   nil mathrt) 
 
 (set-macro-character #\-
   #'(lambda 
      (mstream char)
      (declare (ignore char))
-     (case (pc)
-	   (#\newline '-) (#\> (rc) '->) (#\= (rc) '-=) (#\- (rc) '--) (t '-)))
+     (case (pc mstream)
+	   (#\newline '-) (#\> (rc mstream) '->) (#\= (rc mstream) '-=) (#\- (rc mstream) '--) (t '-)))
   nil mathrt)
 
 (set-macro-character #\[
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc)
-		  (#\newline '[) (#\[ (rc) '[[) (t '[))) 
+      (case (pc mstream)
+		  (#\newline '[) (#\[ (rc mstream) '[[) (t '[))) 
   nil mathrt)
 
 (set-macro-character #\]
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline ']) (#\] (rc) ']]) (t '])))
+      (case (pc mstream) (#\newline ']) (#\] (rc mstream) ']]) (t '])))
   nil mathrt)
 
 (set-macro-character #\{
@@ -165,38 +165,38 @@
 (set-macro-character #\<
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '<) (#\= (rc) '<=) (#\> (rc) '<>) (t '<)))
+      (case (pc mstream) (#\newline '<) (#\= (rc mstream) '<=) (#\> (rc mstream) '<>) (t '<)))
   nil mathrt) 
 
 (set-macro-character #\>
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc)
+      (case (pc mstream)
 		  (#\newline '>)
-		  (#\= (rc) '>=)
-		  (#\> (rc)
-		       (case (pc) (#\newline '>>) (#\> (rc) '>>>) (t '>>)))
+		  (#\= (rc mstream) '>=)
+		  (#\> (rc mstream)
+		       (case (pc mstream) (#\newline '>>) (#\> (rc mstream) '>>>) (t '>>)))
 		  (t '>)))
   nil mathrt) 
 
 (set-macro-character #\!
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '!) (#\! (rc) '!!) (#\= (rc) '!=) (t '!)))
+      (case (pc mstream) (#\newline '!) (#\! (rc mstream) '!!) (#\= (rc mstream) '!=) (t '!)))
   nil mathrt) 
 
 (set-macro-character #\#
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc) (#\newline '|#|) (#\# (rc) '|##|) (t '|#|)))
+      (case (pc mstream) (#\newline '|#|) (#\# (rc mstream) '|##|) (t '|#|)))
   nil mathrt)
 
 (set-macro-character #\\ 
 #'(lambda(mstream char)
     (declare (ignore char))
-    (case (pc)
-	(#\newline (rc) (mread1)) ;; \ at end of line -> splice
-	(t (intern (make-string 1 :initial-element (rc))))
+    (case (pc mstream)
+	(#\newline (rc mstream) (mread1)) ;; \ at end of line -> splice
+	(t (intern (make-string 1 :initial-element (rc mstream))))
 	; \ within line, ignore the \ and return the next char
 	))
 nil mathrt)
@@ -204,37 +204,37 @@ nil mathrt)
 (set-macro-character #\= 
   #'(lambda(mstream char)
       (declare (ignore char))
-      (case (pc)
+      (case (pc mstream)
 		 (#\newline '|=|)
-		 (#\= (rc) 
-		      (case(pc) (#\newline '|==|) (#\= (rc) '|===|) (t '|==|)))
-		 (#\! (rc) (case(pc)
+		 (#\= (rc mstream) 
+		      (case(pc mstream) (#\newline '|==|) (#\= (rc mstream) '|===|) (t '|==|)))
+		 (#\! (rc mstream) (case(pc mstream)
 				(#\newline '|=!|) ;unused
-				(#\= (rc) '|=!=|)
+				(#\= (rc mstream) '|=!=|)
 				(t '|=!|)))
 		 (t '|=|))) nil mathrt)
 
 (set-macro-character #\. 
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc)
+      (case (pc mstream)
 		  (#\newline '|.|)
-		  (#\. (rc) 
-		       (case (pc)
-			     (#\newline '|..|) (#\. (rc) '|...|) (t '|..|)))
+		  (#\. (rc mstream) 
+		       (case (pc mstream)
+			     (#\newline '|..|) (#\. (rc mstream) '|...|) (t '|..|)))
 		  (t '|.|)))
   nil mathrt)
 
 (set-macro-character #\:
   #'(lambda (mstream char)
       (declare (ignore char))
-      (case (pc)
+      (case (pc mstream)
 		  (#\newline '|:|)
-		  (#\> (rc) '|:>|)
-		  (#\: (rc)
-		       (case (pc) 
-			     (#\newline '|::|) (#\= (rc) '|::=|) (t '|::|)))
-		  (#\= (rc) '|:=|)
+		  (#\> (rc mstream) '|:>|)
+		  (#\: (rc mstream)
+		       (case (pc mstream) 
+			     (#\newline '|::|) (#\= (rc mstream) '|::=|) (t '|::|)))
+		  (#\= (rc mstream) '|:=|)
 		  (t '|:|)))
   nil mathrt)
 
@@ -244,7 +244,7 @@ nil mathrt)
 
 (set-macro-character #\@ #'(lambda (mstream char)
 			     (declare (ignore char))
-			     (case (pc) (#\newline '@)(#\@ (rc) '@@)(t '@)))
+			     (case (pc mstream) (#\newline '@)(#\@ (rc mstream) '@@)(t '@)))
 			     nil mathrt) 
 ;; above fixed by lvi@ida.liu 3/20/92
 
@@ -284,28 +284,28 @@ nil mathrt)
 		     #'(lambda (mstream char &aux next)
 			 (declare (ignore char))
 	    (case
-	     (pc)
+	     (pc mstream)
 	     (#\Newline '(Blank))  ; _
-	     (#\. (rc)
+	     (#\. (rc mstream)
 		  '(Optional (Blank)))  ;_.
-	     (#\_ (rc)
+	     (#\_ (rc mstream)
 		  (case
-		   (pc)
+		   (pc mstream)
 		   (#\Newline '(BlankSequence))  ;__
 		   (#\_
-		    (rc)  ;___ (3 of em)
-		    (cond ((and (alpha-char-p (pc))
+		    (rc mstream)  ;___ (3 of em)
+		    (cond ((and (alpha-char-p (pc mstream))
 				(setq next(rt)))
 			   `(BlankNullSequence ,next))
 			  (t '(BlankNullSequence)))) 
 		   (t  ;; __ (2 of em)
-		       (cond ((and (alpha-char-p (pc))
+		       (cond ((and (alpha-char-p (pc mstream))
 				   (setq next(rt)))
 			      `(BlankSequence ,next))
 			     (t '(BlankSequence))) 
 		       )))  
 	     (t ; _ (1 of em)
-		(cond ((and (alpha-char-p (pc))
+		(cond ((and (alpha-char-p (pc mstream))
 			    (setq next(rt)))
 		       `(Blank ,next))
 		      (t '(Blank))))))
@@ -317,9 +317,9 @@ nil mathrt)
 
 (defun sawlpar (mstream char)  ;; comments are (* any text *)
   (declare (ignore char))
-  (case (pc)
+  (case (pc mstream)
 	(#\* ;skip to end of comment
-	     (rc)
+	     (rc mstream)
 	     (commentskip mstream))
 	(t '\())) ;)
 
@@ -329,25 +329,25 @@ nil mathrt)
 (set-macro-character #\% 
   #'(lambda(mstream char)
       (declare (ignore char))
-      (cond((eq(pc) #\%) (parse-outform1 2))
-		((digit-char-p (pc))
+      (cond((eq(pc mstream) #\%) (parse-outform1 2))
+		((digit-char-p (pc mstream))
 		 `(Out,(collect-integer 0 10)))
 		(t '(Out))))
   nil mathrt)
 
-(defun parse-outform1(counter) ; saw more than one % 
-	 (rc)
-	 (cond ((equal (pc) #\%) (parse-outform1 (+ 1 counter))) ;another %
+(defun parse-outform1(counter &optional (mstream t)) ; saw more than one % 
+	 (rc mstream)
+	 (cond ((equal (pc mstream) #\%) (parse-outform1 (+ 1 counter))) ;another %
 	       (t `(Out ,(- counter)))))
   
 
 (defun commentskip (mstream &aux x )
   (loop
-   (setq x (rc))
+   (setq x (rc mstream))
    (cond ((eql x #\( ) (sawlpar mstream x))  
 	 ((and (eql x #\* )
-	       (eql (pc) #\) ))
-	 (rc) ; flush the last leftpar
+	       (eql (pc mstream) #\) ))
+	 (rc mstream) ; flush the last leftpar
 	 (return(mread1)))   ;return next item
    )))
  
@@ -376,12 +376,12 @@ nil mathrt)
   (let ((ares ()))
     (loop (setq res (catch 'endofparse(parse-comp t)))  ;; end=t means a #\newline will end expr.
 	  (setf ares (cons (cond ;((null res) (return 'done))
-			     ((eq #\newline (pc))
+			     ((eq #\newline (pc mstream))
                               ; gjl added following line so a file can 
                               ; end without blank line (or even a cr) without an error.
 			      (if (eq 'eof (peek-char nil mstream nil 'eof))
 				  (return (reverse (cons res ares))))
-			      (rc) 
+			      (rc mstream) 
 			      res) ;; proper ending
 			     ((setq z(rt))
 			      (cond ((equal z 'e-o-l))  ;;may also be proper ending
@@ -404,10 +404,10 @@ nil mathrt)
   (loop (setq res (catch 'endofparse(parse-comp t)))  ;; end=t means a #\newline will end expr.
  ;; following lines added by gjl
 	(print (cond ;((null res) (return 'done))
-		 ((eq #\newline (pc)) 
+		 ((eq #\newline (pc mstream)) 
 		  (if (eq 'eof (peek-char nil mstream nil 'eof))(return res))
 		  (print  (format nil ">> proceeding" ))
-		  (rc) 
+		  (rc mstream) 
 		  res) ;; proper ending
 		 ((setq z(rt))
 		  (cond ((equal z 'e-o-l))  ;;may also be proper ending
@@ -431,8 +431,8 @@ nil mathrt)
   (loop (setq res (catch 'endofparse (parse-comp t)))  ;; end=t means a #\newline will end expr.
     (print (tomacsyma
 	    (cond			;((null res) (return 'done))
-	      ((eq #\newline (pc)) 
-	       (rc) 
+	      ((eq #\newline (pc mstream)) 
+	       (rc mstream) 
 	       res) ;; proper ending
 	       ((setq z(rt))
 	       (cond ((equal z 'e-o-l))  ;;may also be proper ending
@@ -500,13 +500,13 @@ nil mathrt)
 #|
 
 ; orignal version
-(defun mread1()
-;    (format t "~% next char = ~s" (pc)) ;; debug
-  (cond ((member (pc)'( #\space #\tab #\page) :test #'char=)
-	 (rc)(mread1))  ;; fix - 2x bug
-	((digit-char-p (pc));; next character is a digit 0-9
+(defun mread1(&optional (mstream t))
+;    (format t "~% next char = ~s" (pc mstream)) ;; debug
+  (cond ((member (pc mstream)'( #\space #\tab #\page) :test #'char=)
+	 (rc mstream)(mread1))  ;; fix - 2x bug
+	((digit-char-p (pc mstream));; next character is a digit 0-9
 	 (collect-integer 
-	  (char-to-int(rc)) 10)
+	  (char-to-int(rc mstream)) 10)
 	 )
 				;radix 10 default
 	(t (or(read-preserving-whitespace mstream nil 'e-o-l) 'False)
@@ -522,13 +522,13 @@ nil mathrt)
 ;; format. I am not sure exactly what can be coerced and what not
 ;; Caution! this was redefined in eval.lisp. I guess I will
 ;; copy this to eval.lisp inlcude the chash line there.
-(defun mread1( &aux savec savestr )
-;    (format t "~% next char = ~s" (pc)) ;; debug
-  (cond ((member (pc)'( #\space #\tab #\page) :test #'char=)
-	 (rc)(mread1))  ;; fix - 2x bug
-	((digit-char-p (pc));; next character is a digit 0-9
+(defun mread1( &optional (mstream t) &aux savec savestr )
+;    (format t "~% next char = ~s" (pc mstream)) ;; debug
+  (cond ((member (pc mstream) '( #\space #\tab #\page) :test #'char=)
+	 (rc mstream)(mread1))  ;; fix - 2x bug
+	((digit-char-p (pc mstream));; next character is a digit 0-9
 	 (collect-integer 
-	  (char-to-int(rc)) 10)
+	  (char-to-int(rc mstream)) 10)
 	 )
 				;radix 10 default
 	(t
@@ -594,16 +594,16 @@ nil mathrt)
 
 
 ;; parse a number
-(defun parse-number(end &aux (x (parse-int end)) afterdot) ;; reads floats and radix nums also
+(defun parse-number(end &optional (mstream t) &aux (x (parse-int end)) afterdot) ;; reads floats and radix nums also
   (cond (x
 	 (cond 
-	  ((equal (pc) #\.); is the very next character a "."?
-	   (rc) ;; remove exactly that character.
+	  ((equal (pc mstream) #\.); is the very next character a "."?
+	   (rc mstream) ;; remove exactly that character.
 	   ;; note: in Mathematica, 1. 2 is 1.0*2 = 2.0
 	   ;; 1 .2  is 1*0.2 = 0.2
 	   ;; 1 . 2 is Dot[1,2]
 	   ;;Now check: Is there a digit next?
-	   (cond((digit-char-p (pc))
+	   (cond((digit-char-p (pc mstream))
 		 (setq afterdot (parse-frac end))
 		 (cond (afterdot (make-real x afterdot)) ;;like 12.34
 		       (t x)));      not a float -> return integer
@@ -614,7 +614,7 @@ nil mathrt)
 	((guess-token '|.|)
 	 (rt)
 	 ;;is there a digit next?
-	 (cond((digit-char-p (pc))
+	 (cond((digit-char-p (pc mstream))
 	       (setq afterdot (parse-frac end))
 	       (cond (afterdot (make-real 0 afterdot)) ;;like 0.34
 		     (t "what's a dot doing here?")))));; we could make it 0?
@@ -624,12 +624,12 @@ nil mathrt)
 
 ;;parse an integer, including radix
 
-(defun parse-int(end &aux (x (peek-token))) 
+(defun parse-int(end &optional (mstream t) &aux (x (peek-token))) 
   (cond 
    ((integerp x)
 	 (cond
 	  ((eolp end) x)
-	  ((and (rt) (eql (pc) #\^) ;; don't sop up extra spaces here. what if 1 .2
+	  ((and (rt) (eql (pc mstream) #\^) ;; don't sop up extra spaces here. what if 1 .2
 		(guess-token '|^^|)) ;; see if it is, e.g. 8^^101 =65
 	   (rt)
 	   (cond((or (> x 10)
@@ -641,13 +641,13 @@ nil mathrt)
 
 ;; parse the fraction part of a decimal number .123
 
-(defun parse-frac(end &aux x (num 0)(den 1))
+(defun parse-frac(end &optional (mstream t) &aux x (num 0)(den 1))
  (declare (ignore end))
  (loop
    ;; since all of the line termination chars are not digits, all we
    ;; need to check is for digits..
-   (if  (not(setq x(digit-char-p (pc)))) (return (/ num den)))
-   (rc) ;; read past the char
+   (if  (not(setq x(digit-char-p (pc mstream)))) (return (/ num den)))
+   (rc mstream) ;; read past the char
    (setq den (* den 10))
    (setq num (+ (* 10 num) x))
 ))

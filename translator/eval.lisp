@@ -177,13 +177,13 @@ Mockmma is in no way associated with WRI and is based on code written by Richard
 
 |#
 
-(defun mread1( &aux savec savestr )
-;    (format t "~% next char = ~s" (pc)) ;; debug
-  (cond ((member (pc)'( #\space #\tab #\page) :test #'char=)
-	 (rc)(mread1))  ;; fix - 2x bug
-	((digit-char-p (pc));; next character is a digit 0-9
+(defun mread1( &optional (stream t) &aux savec savestr )
+;    (format t "~% next char = ~s" (pc stream)) ;; debug
+  (cond ((member (pc stream)'( #\space #\tab #\page) :test #'char=)
+	 (rc stream)(mread1 stream))  ;; fix - 2x bug
+	((digit-char-p (pc stream));; next character is a digit 0-9
 	 (collect-integer 
-	  (char-to-int(rc)) 10)
+	  (char-to-int(rc stream)) 10)
 	 )
 				;radix 10 default
 	(t
@@ -624,7 +624,7 @@ expr))
 	  nil)
 	   (gethash '|Out| symtab)))
 	 
-(defun |Simp|(x)(simp x)) ;; rational simplification
+(defun |Simp|(x)(maxima::$ratsimp x)) ;; rational simplification
 
 (defun |Rat|(x)(into-rat x)) ;; leave the answer in rational form.
 (defun |UnRat|(x)(outof-rat x)) ;; convert the answer to list form.

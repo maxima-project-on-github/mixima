@@ -447,7 +447,7 @@
 
 ;;this program is not structurally correct...  says who? rjf 7/4/09
 ;;#+ignore
-(defun mlistfol (pl el i h) ;; name condition
+(defun mlistfol (pl el i h name)
 
   (cond ((null pl) (null el));; success if we run out of p and e together
 	((= i h) nil);;exhausted all possibilities. Can't match (car pl). Fail.
@@ -645,7 +645,7 @@
 (defun |FreeQ| (l x) 
   (labels((freeqx (h)(|FreeQ| h x))
 	  (dependsx (h)(null (|FreeQ| h x))))  ;;returns t or nil
-	 (cond ((MatchQ l x) nil)
+	 (cond ((|MatchQ| l x) nil)
 	       ((consp l)(if (some #'dependsx (cdr l))
 			     nil t))
 	       (t t))))

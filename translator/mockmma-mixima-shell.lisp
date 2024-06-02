@@ -36,6 +36,8 @@
 (maxima::$load "parser_patch.lisp")
 (maxima::$load "mma-to-mixima.lisp")
 (maxima::$load "stack1.lisp")
+(maxima::$load "poly.lisp")
+(maxima::$load "simp1.lisp")
 (maxima::$load "rat1.lisp")
 (maxima::$load "eval.lisp")
 (maxima::$load "pf.lisp")
@@ -118,7 +120,7 @@ Distributed under the GNU General Public License."))
                                           mma-parser-error-val
                                           mma-parser-error-string
 	                                      (mmaprefix "") (mmasuffix "")
-                                          trailing-semicolon-flag )
+                                          trailing-semicolon-flag hs )
   (when (find-package :maxima)
     (setf mmaprefix maxima::*prompt-prefix*)
     (setf mmasuffix maxima::*prompt-suffix*))

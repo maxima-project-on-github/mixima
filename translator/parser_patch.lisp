@@ -4,10 +4,10 @@
 ;; work with gcl, which does not allow (setf (readtable-case mathrt) :preserve) 
 
 (defun mread1(&optional (stream t))
-  ;;  (format t "~% next char = ~s" (pc))
-  (cond ((member (pc)'( #\space #\tab #\page) :test #'char=)
-	 (rc)(mread1))  ;; fix - 2x bug
-	((digit-char-p (pc));; next character is a digit 0-9
+  ;;  (format t "~% next char = ~s" (mma::pc stream))
+  (cond ((member (mma::pc stream)'( #\space #\tab #\page) :test #'char=)
+	 (mma::rc stream)(mread1))  ;; fix - 2x bug
+	((digit-char-p (mma::pc stream));; next character is a digit 0-9
 	 (collect-integer 
 	  (char-to-int(read-char stream)) 10)) ;radix 10 default
 	(t (or	;;(read-preserving-whitespace stream nil 'e-o-l)
