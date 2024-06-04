@@ -1495,7 +1495,7 @@ nil mathrt)
 (set-dispatch-macro-character #\# #\m
       #'(lambda (mstream sub-char infix-argument)
          (declare (ignore sub-char infix-argument))
-         (list 'quote(mma::p mstream) )))
+         (list 'quote(mma-parser mstream) )))
 
 
 

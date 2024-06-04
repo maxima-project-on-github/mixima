@@ -38,6 +38,8 @@
 
 |#
 
+(defvar $mixima_lambda_args nil)
+
 #|> Function Function |#
 (defmspec |$Function| ( x &aux callargs arglist )
   (setf callargs (rest x))

@@ -9,8 +9,7 @@
 
 ;;(provide 'disp1)
 
-#-gcl(eval-when (compile) (load "mma"))
-#+gcl(eval-when (compile) (load "mma.lisp"))
+(eval-when (:compile-toplevel) (load "mma.lisp"))
 
 (in-package :mma)
 ;;(export '(COL disp dispstruct))
@@ -27,7 +26,7 @@
   (x 0 :type fixnum) (y 0 :type fixnum))
 
 ;; testing display routine
-(defun td ()
+#+nil (defun td () ;; NOT CALLED FROM ANYWHERE AND CAN'T LOCATE FUNCTION MMA::P, SO DISABLE THIS. RHD 2024-06-02
   (disp (BuildFormat (mma::p)))
   (terpri)
   (terpri)

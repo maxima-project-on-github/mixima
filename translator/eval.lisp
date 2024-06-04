@@ -336,7 +336,6 @@ Mockmma is in no way associated with WRI and is based on code written by Richard
 ;; also, we have to decide which bigfloat to use... mpfun or rjf's
 ;; old bfstuff.
 
-(defun matrix-p(x) (declare (ignore x)) nil) ;;; for now, this will have to do.
 (defun |SetQQ|(lhs rhs &aux h);; lhs=rhs, but don't mevaluate either.
   
   (setq h(cond ((atom lhs) lhs)

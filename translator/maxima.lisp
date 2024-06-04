@@ -13,7 +13,7 @@
 
 ;; RJF 6/30/09
 
-(eval-when (compile) (load "mma"))
+(eval-when (:compile-toplevel) (load "mma"))
 (in-package :mma)
 (provide 'math2max)
 (in-package :mma)

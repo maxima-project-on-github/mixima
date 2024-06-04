@@ -37,11 +37,11 @@
 ;;6/3/92 RJF fixed display of operators .. f[x][y]
 
 ;;(provide 'pf)
-(eval-when (compile)(load "mma"))
+(eval-when (:compile-toplevel)(load "mma"))
 (in-package :mma)
 
 ;;;  exported functions:
-(eval-when (load)
+(eval-when (:load-toplevel)
 (export '(MakeHForm MakeVForm formatwidth formatheight atomwidth
 		   BuildFormat)))
 
@@ -136,7 +136,7 @@
 
 ;;  tp:   procedure for repeatedly testing the parser
 
-(defun tp ()
+#+nil (defun tp () ;; NOT CALLED FROM ANYWHERE AND CAN'T LOCATE FUNCTION MMA::P, SO DISABLE THIS. RHD 2024-06-02
   (format t "~s" (mma::p))
   (terpri)
   (tp))
@@ -150,7 +150,7 @@
 ;;        BuildFormat to form the
 ;;        "PrintForm" lists.
 
-(defun printform ()
+#+nil (defun printform () ;; NOT CALLED FROM ANYWHERE AND CAN'T LOCATE FUNCTION MMA::P, SO DISABLE THIS. RHD 2024-06-02
   (format t "~s" (BuildFormat (mma::p)))
   ;; repeat, ad naseum
   (terpri)

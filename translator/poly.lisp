@@ -252,7 +252,7 @@
 (defun p+into (v1 v2 shorter longer)
       (declare (fixnum shorter longer)
 	    ;; (simple-vector v1 v2 )
-	     (inline p+vv-zero-check) )
+	    )
 
       (let ((res (make-array longer)))
 	      (declare (simple-vector  res))

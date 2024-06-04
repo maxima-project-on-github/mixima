@@ -65,8 +65,6 @@
 ;;(declaim (optimize (speed 3) (safety 0) (space 0) (compilation-speed 0)))
 ;;(declaim (optimize (speed 0) (safety 3) (space 0) (compilation-speed 0)))
 
-(eval-when (:compile-toplevel) (load "c:/lisp/mma4max/poly.lisp")) ;; need macro defs  3/9/2019
-
 ;; export what other modules may need
 #+ignore (export '(make-fpe fpe-expand fpe-coef-p fpe-coefone-p fpe-negativep
 		   fpe-insert fpe-coefzero-p

@@ -446,7 +446,7 @@
 ;; start with element i of expressionlist el, length of el is h.
 
 ;;this program is not structurally correct...  says who? rjf 7/4/09
-;;#+ignore
+#+ignore
 (defun mlistfol (pl el i h name)
 
   (cond ((null pl) (null el));; success if we run out of p and e together
@@ -535,6 +535,23 @@
 				 
 	       ))))))
 	     		 
+;;******makeshift for now..********
+
+(defun mlistfol(patlist  explist  count max)
+  (format t "~% mlistfol ~s  ~s ~s ~s" patlist explist count max)
+  ;; there are count items in the expression list
+  ;; for each item in the pattern list we can try matching it
+  ;; against 0 of the expressions, 1 of the expressions,
+  ;; up to count.
+  ;; recursively we can reduce the number of patterns in patlist
+  ;; and delete from the explist those items accounted for.
+  
+  ;; Do we need to know the Head? If c___ matches Sequence[], 
+  ;; Plus[c] is 0, Times[c] is 1 ... 
+  ;; notes 12/21/2010 RJF  
+
+  )
+
 (defun true2 (x y) (declare (ignore x y)) t)		
 	       
 ;; match a pattern and an expression

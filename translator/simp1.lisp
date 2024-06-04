@@ -281,6 +281,23 @@
 			  (mapcar #'(lambda(x)(gethash x revtab))
 			    (collectvars (into-rat x)))))
 
+;; collectvars returns a list of all the variable (numbers) in a
+;; rational form r.  E.g. (collectvars #(3 #(1 1 1) 0 1)) -> (1 3)
+
+(defun collectvars (r &aux (cv nil))
+  (labels
+   ((cv2 (pr) ;; cv2 is applied to each pair: poly . power
+	 (cv3 (car pr)))
+    (cv3 (p) ;; cv3 is applied to each polynomial
+	 (cond ((coefp p) nil)
+	       (t (pushnew (svref p 0) cv)		  
+		  (do ((i (1- (length p))(1- i)))
+		      ((= i 0) nil)
+		      (cv3 (svref p i)))))))
+	      
+   (mapc #'cv2 (rat-numerator r))
+   (mapc #'cv2 (rat-denominator r))
+   cv))
 
 
 #+ignore  ;; one way of putting floats into the system

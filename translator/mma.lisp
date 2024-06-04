@@ -60,4 +60,4 @@
   )
 
 ;; from eval
-(eval-when (compile load eval)(export '(mockmma mockmma2 mread1)))
+(eval-when (:compile-toplevel :load-toplevel :execute)(export '(mockmma mockmma2 mread1)))

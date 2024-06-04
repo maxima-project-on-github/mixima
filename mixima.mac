@@ -79,6 +79,4 @@ load("list.mac");
 
 load("general.mac");
 
-print("mixima version VERSIONNUMBER loaded.");
-
 load("loadlast.mac");

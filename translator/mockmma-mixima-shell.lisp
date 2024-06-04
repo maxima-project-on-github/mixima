@@ -37,8 +37,9 @@
 (maxima::$load "mma-to-mixima.lisp")
 (maxima::$load "stack1.lisp")
 (maxima::$load "poly.lisp")
-(maxima::$load "simp1.lisp")
 (maxima::$load "rat1.lisp")
+(maxima::$load "simp1.lisp")
+(maxima::$load "nmatrix.lisp")
 (maxima::$load "eval.lisp")
 (maxima::$load "pf.lisp")
 (maxima::$load "disp1.lisp")
@@ -111,7 +112,7 @@ Distributed under the GNU General Public License."))
 ;  (format t "mixima-shell: ~a~%" s)
   (if  mixima-mma-shell-debug-flag (format t " mixima-shell: ~a.~%" s)))
 
-(defun mixima-read-eval-print-loop (&optional (stream t) &aux parsed-mma-input
+(defun mixima-read-eval-print-loop (&optional (stream t) &aux parsed-with-input parsed-mma-input
                                           mma-input-string max-input-string
                                           max-internal
                                           max-out-expr mma-out-expr(firsttime t)
